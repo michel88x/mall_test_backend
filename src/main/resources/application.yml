@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/mall_test_db?useSSL=false&serverTimezone=UTC
+    username: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: mall.testy.2025@gmail.com
+    password: vyhd yell ntbl rtjm
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  servlet:
+    multipart:
+      max-file-size: 2GB
+      max-request-size: 2GB
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        transaction:
+          coordinator_class: jdbc
+    database: MYSQL
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+application:
+  security:
+    jwt:
+      secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      expiration: 604800000 # 1 Week
+      refresh-token:
+        expiration: 1209600000 # 2 Weeks
+
