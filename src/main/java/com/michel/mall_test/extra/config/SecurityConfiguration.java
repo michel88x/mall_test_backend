@@ -35,6 +35,7 @@ public class SecurityConfiguration {
         /// Define all the APIs urls that we want it to be secured
         http.csrf(AbstractHttpConfigurer::disable) // Replaces csrf().disable()
                 .authorizeHttpRequests(auth -> auth
+//                                .anyRequest().permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/slider/**").permitAll()
                         .requestMatchers("/api/v1/city/**").permitAll()

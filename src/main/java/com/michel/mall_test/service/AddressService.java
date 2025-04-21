@@ -106,7 +106,6 @@ public class AddressService {
             if(dto.getDefault() != null) address.setDefault(dto.getDefault());
             if(dto.getNote() != null && !dto.getNote().isEmpty()) address.setNote(dto.getNote());
 
-            // No need to call save explicitly if within @Transactional and the entity is managed
             return BaseResponse.BaseResponseBuilder.aBaseResponse()
                     .withSuccess(true)
                     .withMessage("Address updated successfully")
@@ -122,6 +121,7 @@ public class AddressService {
         if(getOneAddress(id) != null){
         addressRepository.setDefault(id);
         Address address = getOneAddress(id);
+        address.setDefault(true);
         return BaseResponse.BaseResponseBuilder.aBaseResponse()
                 .withSuccess(true)
                 .withMessage("The address has been set to default one")
