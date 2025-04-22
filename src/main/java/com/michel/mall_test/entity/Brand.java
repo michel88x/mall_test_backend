@@ -82,6 +82,7 @@ public class Brand extends BaseEntity{
 
 
     public static final class BrandBuilder {
+        private Long id;
         private String slug;
         private String name;
         private String description;
@@ -93,6 +94,11 @@ public class Brand extends BaseEntity{
 
         public static BrandBuilder aBrand() {
             return new BrandBuilder();
+        }
+
+        public BrandBuilder withId(Long id) {
+            this.id = id;
+            return this;
         }
 
         public BrandBuilder withSlug(String slug) {
@@ -122,6 +128,7 @@ public class Brand extends BaseEntity{
 
         public Brand build() {
             Brand brand = new Brand();
+            brand.setId(id);
             brand.setSlug(slug);
             brand.setName(name);
             brand.setDescription(description);
