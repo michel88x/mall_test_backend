@@ -38,4 +38,6 @@ application:
       expiration: 604800000 # 1 Week
       refresh-token:
         expiration: 1209600000 # 2 Weeks
+  referral:
+    code-value: 100
 

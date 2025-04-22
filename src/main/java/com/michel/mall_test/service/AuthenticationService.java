@@ -12,6 +12,7 @@ import com.michel.mall_test.repository.TokenRepository;
 import com.michel.mall_test.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,16 +33,27 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final TokenRepository tokenRepository;
     private final UserVerificationCodeService userVerificationCodeService;
+    private final ReferralCodeService referralCodeService;
 
 
-    public AuthenticationService(UserRepository repository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, TokenRepository tokenRepository, UserVerificationCodeService userVerificationCodeService) {
+    public AuthenticationService(UserRepository repository,
+                                 PasswordEncoder passwordEncoder,
+                                 JwtService jwtService,
+                                 AuthenticationManager authenticationManager,
+                                 TokenRepository tokenRepository,
+                                 UserVerificationCodeService userVerificationCodeService,
+                                 ReferralCodeService referralCodeService) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.tokenRepository = tokenRepository;
         this.userVerificationCodeService=  userVerificationCodeService;
+        this.referralCodeService = referralCodeService;
     }
+
+    @Value("${application.referral.code-value}")
+    private Integer referralCodeValue;
 
 
     public BaseResponse register(RegisterRequest request) {
@@ -67,11 +79,23 @@ public class AuthenticationService {
         user.setPoints(0);
         user.setPass(passwordEncoder.encode(request.getPassword()));
         user.setRole(Role.CLIENT);
+        //Save the new user
         User savedUser = repository.save(user);
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
+        //Save the user tokens
         saveUserToken(savedUser, jwtToken);
+        //Save the user verification code and send via email
         userVerificationCodeService.addNewVerificationCode(savedUser);
+        //Save the user referral code
+        referralCodeService.generateUserReferralCode(savedUser);
+        //Check if Referral Code for another user used
+        if(request.getReferralCode() != null && !request.getReferralCode().isEmpty()){
+            Boolean useCodeResult = referralCodeService.useReferralCode(request.getReferralCode(), savedUser);
+            if(useCodeResult){
+                savedUser.setPoints(referralCodeValue);
+            }
+        }
         res.setSuccess(true);
         res.setMessage("Registered Successfully");
         res.setData(UserDto.UserDtoBuilder.anUserDto()

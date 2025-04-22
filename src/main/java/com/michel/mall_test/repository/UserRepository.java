@@ -20,4 +20,8 @@ public interface UserRepository extends BaseRepository<User> {
     @Modifying
     @Query("update User u set u.emailVerified = true where u.id = :id")
     void updateUserEmailVerified(@Param("id") Long id);
+
+    @Modifying
+    @Query("update User u set u.points = :points where u.id = :id")
+    void updatePoints(@Param("id") Long id, @Param("points") Integer points);
 }

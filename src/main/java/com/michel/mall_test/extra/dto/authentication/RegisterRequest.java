@@ -16,23 +16,24 @@ public class RegisterRequest {
     @Size(min = 9, max = 10, message = "Your phone number must be 9 or 10 digits")
     private String phoneNumber;
     @NotEmpty(message = "You must pick your birthdate")
-    @Past(message = "Your birthdate must be a date in the past")
     private String birthdate;
     @NotEmpty(message = "You must pick your gender")
     private String gender;
     @NotEmpty(message = "You must write your password")
-    @Min(value = 8, message = "Your password must be 8 characters length at least")
+    @Size(min = 8, message = "Your password must be 8 characters length at least")
     private String password;
+    private String referralCode;
 
     public RegisterRequest() {}
 
-    public RegisterRequest(String name, String email, String phoneNumber, String birthdate, String gender, String password) {
+    public RegisterRequest(String name, String email, String phoneNumber, String birthdate, String gender, String password, String referralCode) {
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.birthdate = birthdate;
         this.gender = gender;
         this.password = password;
+        this.referralCode = referralCode;
     }
 
     public String getName() {
@@ -83,6 +84,13 @@ public class RegisterRequest {
         this.password = password;
     }
 
+    public String getReferralCode() {
+        return referralCode;
+    }
+
+    public void setReferralCode(String referralCode) {
+        this.referralCode = referralCode;
+    }
 
     public static final class RegisterRequestBuilder {
         private String name;
@@ -91,6 +99,7 @@ public class RegisterRequest {
         private String birthdate;
         private String gender;
         private String password;
+        private String referralCode;
 
         private RegisterRequestBuilder() {
         }
@@ -129,6 +138,11 @@ public class RegisterRequest {
             return this;
         }
 
+        public RegisterRequestBuilder withReferralCode(String referralCode) {
+            this.password = password;
+            return this;
+        }
+
         public RegisterRequest build() {
             RegisterRequest registerRequest = new RegisterRequest();
             registerRequest.setName(name);
@@ -137,6 +151,7 @@ public class RegisterRequest {
             registerRequest.setBirthdate(birthdate);
             registerRequest.setGender(gender);
             registerRequest.setPassword(password);
+            registerRequest.setReferralCode(referralCode);
             return registerRequest;
         }
     }

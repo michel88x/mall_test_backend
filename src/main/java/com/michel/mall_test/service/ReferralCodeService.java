@@ -8,6 +8,7 @@ import com.michel.mall_test.extra.exceptions.RecordNotFoundException;
 import com.michel.mall_test.repository.ReferralCodeRepository;
 import com.michel.mall_test.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,12 @@ public class ReferralCodeService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private GeneralService generalService;
+
+    @Value("${application.referral.code-value}")
+    private Integer referralCodeValue;
 
     public BaseResponse getAllReferralCodes(){
         return BaseResponse.BaseResponseBuilder.aBaseResponse()
@@ -115,5 +122,32 @@ public class ReferralCodeService {
                     .build();
         }
         throw new RecordNotFoundException("The referral code does not exist");
+    }
+
+    @Transactional
+    public Boolean generateUserReferralCode(User user){
+        String newCode = generalService.generateRandomString();
+        Optional<ReferralCode> codeInDB = referralRepository.findOneByCode(newCode);
+        if(codeInDB.isPresent()){
+            generateUserReferralCode(user);
+        }else{
+            addNewReferralCode(ReferralCodeDto.referralCodeDtoBuilder.areferralCodeDto()
+                    .withCode(newCode)
+                    .withValue(referralCodeValue)
+                    .withUser(user.getId())
+                    .build());
+        }
+        return true;
+    }
+
+    @Transactional
+    public Boolean useReferralCode(String code, User codeUser){
+        Optional<User> codeOwner = referralRepository.findUserByCode(code);
+        if(codeOwner.isPresent()) {
+            userRepository.updatePoints(codeOwner.get().getId(), (codeOwner.get().getPoints() !=null? codeOwner.get().getPoints() : 0) + referralCodeValue);
+            userRepository.updatePoints(codeUser.getId(), referralCodeValue);
+            return true;
+        }
+        return false;
     }
 }
