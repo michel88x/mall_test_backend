@@ -1,5 +1,6 @@
 package com.michel.mall_test.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -24,6 +25,7 @@ public class Brand extends BaseEntity{
 
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
+    @JsonIgnore
     private List<Product> products;
 
     public Brand() {}

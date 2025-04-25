@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
@@ -40,6 +42,23 @@ public class FileStorageService {
             throw new FileNotFoundException("Requested file not found");
         }
         return fileToDownload;
+    }
+
+    public Boolean deleteFile(String filePath){
+        try {
+            Path path = Paths.get(filePath);
+            boolean deleted = Files.deleteIfExists(path);
+            if (deleted) {
+                System.out.println("File deleted successfully.");
+                return true;
+            } else {
+                System.out.println("File not found.");
+                return false;
+            }
+        } catch (IOException e) {
+            System.err.println("Error deleting file: " + e.getMessage());
+            return false;
+        }
     }
 
 }

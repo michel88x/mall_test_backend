@@ -83,15 +83,18 @@ public class BrandService {
     public BaseResponse updateBrand(BrandDto dto, Long id){
         Brand brand = getOneBrand(id);
         if(brand != null) {
+            String oldImagePath = brand.getImage();
+            boolean deleteOldImage = false;
             String filePath = "";
             if(dto.getFile() != null){
                 try{
                     filePath = fileStorageService.saveFile(dto.getFile());
+                    deleteOldImage = true;
                 } catch (IOException e) {
                     throw new FailedSaveFileException("Failed to upload the image, please try another one");
                 }
             }else{
-                filePath = brand.getImage();
+                filePath = oldImagePath;
             }
             Brand newBrand = brandRepository.save(Brand.BrandBuilder.aBrand()
                     .withId(brand.getId())
@@ -100,6 +103,9 @@ public class BrandService {
                     .withDescription(dto.getDescription() != null && !dto.getDescription().isEmpty()? dto.getDescription() : brand.getDescription())
                     .withImage(filePath)
                     .build());
+            if(deleteOldImage){
+                fileStorageService.deleteFile(oldImagePath);
+            }
             return BaseResponse.BaseResponseBuilder.aBaseResponse()
                     .withSuccess(true)
                     .withMessage("Brand updated successfully")

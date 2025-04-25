@@ -88,15 +88,18 @@ public class SliderService {
     public BaseResponse updateSlider(SliderDto dto, Long id){
         Slider slider = getOneSlider(id);
         if(slider != null) {
+            String oldImagePath = slider.getImageUrl();
+            boolean deleteOldImage = false;
             String filePath = "";
             if(dto.getFile() != null){
                 try{
                     filePath = fileStorageService.saveFile(dto.getFile());
+                    deleteOldImage = true;
                 } catch (IOException e) {
                     throw new FailedSaveFileException("Failed to upload the image, please try another one");
                 }
             }else{
-                filePath = slider.getImageUrl();
+                filePath = oldImagePath;
             }
             Slider newSlider = sliderRepository.save(Slider.SliderBuilder.aSlider()
                             .withId(slider.getId())
@@ -107,6 +110,9 @@ public class SliderService {
                             .withUrl(dto.getUrl() != null && !dto.getUrl().isEmpty()? dto.getUrl() : slider.getUrl())
                             .withImageUrl(filePath)
                     .build());
+            if(deleteOldImage){
+                fileStorageService.deleteFile(oldImagePath);
+            }
             return BaseResponse.BaseResponseBuilder.aBaseResponse()
                     .withSuccess(true)
                     .withMessage("Slider updated successfully")
