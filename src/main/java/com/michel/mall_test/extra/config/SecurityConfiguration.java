@@ -41,6 +41,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/city/**").permitAll()
                         .requestMatchers("/api/v1/referral-code/**").permitAll()
                                 .requestMatchers("/api/v1/brand/**").permitAll()
+                                .requestMatchers("/api/v1/category/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

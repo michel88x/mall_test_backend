@@ -1,6 +1,7 @@
 package com.michel.mall_test.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -39,6 +40,7 @@ public class Category extends BaseEntity{
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
+    @JsonIgnore
     private List<Product> products;
 
     public Category() {}
@@ -124,6 +126,7 @@ public class Category extends BaseEntity{
 
 
     public static final class CategoryBuilder {
+        private Long id;
         private String slug;
         private Boolean visibility;
         private String name;
@@ -138,6 +141,11 @@ public class Category extends BaseEntity{
 
         public static CategoryBuilder aCategory() {
             return new CategoryBuilder();
+        }
+
+        public CategoryBuilder withId(Long id) {
+            this.id = id;
+            return this;
         }
 
         public CategoryBuilder withSlug(String slug) {
@@ -182,6 +190,7 @@ public class Category extends BaseEntity{
 
         public Category build() {
             Category category = new Category();
+            category.setId(id);
             category.setSlug(slug);
             category.setVisibility(visibility);
             category.setName(name);

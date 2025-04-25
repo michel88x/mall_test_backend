@@ -40,4 +40,6 @@ application:
         expiration: 1209600000 # 2 Weeks
   referral:
     code-value: 100
+  storage:
+    path: /Users/michel/SpringProjects/mall_test/src/main/resources/files
 

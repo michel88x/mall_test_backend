@@ -1,5 +1,7 @@
 package com.michel.mall_test.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,13 +16,20 @@ import java.util.Objects;
 
 @Service
 public class FileStorageService {
-    private static final String STORAGE_DIRECTORY = "/Users/michel/SpringProjects/mall_test/src/main/resources/files";
+
+    @Value("${application.storage.path}")
+    private String STORAGE_DIRECTORY;
+
+    @Autowired
+    private DateService dateService;
 
     public String saveFile(MultipartFile file) throws IOException {
         if(file == null){
             throw new NullPointerException("File is null");
         }
-        var targetFile = new File(STORAGE_DIRECTORY + File.separator + file.getOriginalFilename());
+        String fileName = "image_" + dateService.getTDateTime().replaceAll("-", "_").replaceAll(":", "_") + "." + getFileExtension(file);
+        System.out.println("FileName: " + fileName);
+        var targetFile = new File(STORAGE_DIRECTORY + File.separator + fileName);
         /// Check if the parent folder of the file is the same as STORAGE_DIRECTORY for security matter
         if(!Objects.equals(targetFile.getParent(), STORAGE_DIRECTORY)){
             throw new SecurityException("Unsupported file name");
@@ -61,4 +70,11 @@ public class FileStorageService {
         }
     }
 
+    public static String getFileExtension(MultipartFile file) {
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename != null && originalFilename.contains(".")) {
+            return originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+        }
+        return ""; // No extension
+    }
 }
