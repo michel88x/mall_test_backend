@@ -1,6 +1,7 @@
 package com.michel.mall_test.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ public class ProductImage extends BaseEntity{
     private String path;
 
     @OneToOne(mappedBy = "mainImage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Product oneProduct;
 
     @ManyToOne(fetch = FetchType.LAZY)

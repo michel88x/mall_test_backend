@@ -2,6 +2,7 @@ package com.michel.mall_test.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.michel.mall_test.extra.enums.ProductStatus;
 import jakarta.persistence.*;
@@ -26,16 +27,12 @@ public class Product extends BaseEntity{
 
     @Enumerated(EnumType.STRING)
     @JsonFormat(shape = JsonFormat.Shape.STRING, with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_VALUES)
-    @Formula("CASE remain_in_stock > 0 THEN com.michel.mall_test.extra.enums.ProductStatus.IN_STOCK ELSE com.michel.mall_test.extra.enums.ProductStatus.OUT_OF_STOCK END")
+    @Formula("CASE WHEN remain_in_stock > 0 THEN 'IN_STOCK' ELSE 'OUT_OF_STOCK' END")
     private ProductStatus status;
 
     @Column
     @ColumnDefault(value = "true")
     private Boolean visibility;
-
-    @Column
-    @ColumnDefault(value = "false")
-    private Boolean favourited;
 
     @Column
     private Double regularPrice;
@@ -56,7 +53,7 @@ public class Product extends BaseEntity{
     @Column
     private Integer remainInStock;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne()
     @JoinColumn(name = "main_image_id")
     private ProductImage mainImage;
 
@@ -76,18 +73,22 @@ public class Product extends BaseEntity{
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     @JsonManagedReference
+    @JsonIgnore
     private List<ProductRate> rates;
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     @JsonManagedReference
+    @JsonIgnore
     private List<FavouriteProduct> favourites;
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     @JsonManagedReference
+    @JsonIgnore
     private List<CartProduct> cartProducts;
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     @JsonManagedReference
+    @JsonIgnore
     private List<OrderProduct> orderProducts;
 
     public Product() {
@@ -97,13 +98,12 @@ public class Product extends BaseEntity{
         super(id, createdAt, updatedAt);
     }
 
-    public Product(String name, String description, String slug, ProductStatus status, Boolean visibility, Boolean favourited, Double regularPrice, Double offerPrice, Boolean hasOffer, Boolean isNew, Boolean deliveryFree, Integer remainInStock, ProductImage mainImage, List<ProductImage> images, Category category, Brand brand, List<ProductRate> rates, List<FavouriteProduct> favourites, List<CartProduct> cartProducts, List<OrderProduct> orderProducts) {
+    public Product(String name, String description, String slug, ProductStatus status, Boolean visibility, Double regularPrice, Double offerPrice, Boolean hasOffer, Boolean isNew, Boolean deliveryFree, Integer remainInStock, ProductImage mainImage, List<ProductImage> images, Category category, Brand brand, List<ProductRate> rates, List<FavouriteProduct> favourites, List<CartProduct> cartProducts, List<OrderProduct> orderProducts) {
         this.name = name;
         this.description = description;
         this.slug = slug;
         this.status = status;
         this.visibility = visibility;
-        this.favourited = favourited;
         this.regularPrice = regularPrice;
         this.offerPrice = offerPrice;
         this.hasOffer = hasOffer;
@@ -118,6 +118,14 @@ public class Product extends BaseEntity{
         this.favourites = favourites;
         this.cartProducts = cartProducts;
         this.orderProducts = orderProducts;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -150,14 +158,6 @@ public class Product extends BaseEntity{
 
     public void setVisibility(Boolean visibility) {
         this.visibility = visibility;
-    }
-
-    public Boolean getFavourited() {
-        return favourited;
-    }
-
-    public void setFavourited(Boolean favourited) {
-        this.favourited = favourited;
     }
 
     public Double getRegularPrice() {
@@ -403,7 +403,7 @@ public class Product extends BaseEntity{
         }
 
         public Product build() {
-            return new Product(name, description, slug, status, visibility, favourited, regularPrice, offerPrice, hasOffer, isNew, deliveryFree, remainInStock, mainImage, images, category, brand, rates, favourites, cartProducts, orderProducts);
+            return new Product(name, description, slug, status, visibility, regularPrice, offerPrice, hasOffer, isNew, deliveryFree, remainInStock, mainImage, images, category, brand, rates, favourites, cartProducts, orderProducts);
         }
     }
 }
